@@ -137,22 +137,55 @@ const igGrid = [ig1, ig2, ig3, ig4, ig5, ig6];
 
 
 function Index() {
+  const [query, setQuery] = useState("");
+  const [activeFamily, setActiveFamily] = useState<(typeof families)[number]>(
+    "Todos",
+  );
+  const [sortKey, setSortKey] = useState<SortKey>("destacados");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let list = products.filter((p) => {
+      const matchesFamily =
+        activeFamily === "Todos" || p.family === activeFamily;
+      const matchesQuery =
+        q === "" ||
+        p.name.toLowerCase().includes(q) ||
+        p.notes.toLowerCase().includes(q) ||
+        p.family.toLowerCase().includes(q);
+      return matchesFamily && matchesQuery;
+    });
+    switch (sortKey) {
+      case "precio-asc":
+        list = [...list].sort((a, b) => a.price - b.price);
+        break;
+      case "precio-desc":
+        list = [...list].sort((a, b) => b.price - a.price);
+        break;
+      case "alfabetico":
+        list = [...list].sort((a, b) => a.name.localeCompare(b.name, "es"));
+        break;
+    }
+    return list;
+  }, [query, activeFamily, sortKey]);
+
   return (
     <div className="bg-background text-foreground font-[var(--font-body)]">
+
       {/* Navigation */}
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-12 py-5 bg-background/80 backdrop-blur-md border-b border-border">
         <span className="font-[var(--font-display)] text-xl tracking-tight">
           NATALIA SANTOS
         </span>
         <div className="hidden md:flex gap-10 text-[11px] uppercase tracking-[0.2em] font-medium">
-          <a href="#coleccion" className="hover:text-primary transition-colors">
-            Colección
+          <a href="#catalogo" className="hover:text-primary transition-colors">
+            Catálogo
           </a>
           <a href="#esencia" className="hover:text-primary transition-colors">
             Nuestra Esencia
           </a>
           <a href="#destacado" className="hover:text-primary transition-colors">
-            Taller
+            Destacado
           </a>
         </div>
         <button className="text-[11px] uppercase tracking-widest hover:text-primary transition-colors">
@@ -177,7 +210,7 @@ function Index() {
             Fragancias que cuentan tu historia
           </h1>
           <a
-            href="#coleccion"
+            href="#catalogo"
             className="inline-block px-10 py-4 bg-foreground text-background text-[11px] uppercase tracking-[0.2em] font-medium hover:bg-primary transition-all duration-300"
           >
             Comprar ahora
@@ -218,65 +251,129 @@ function Index() {
         </div>
       </section>
 
-      {/* Colección */}
-      <section id="coleccion" className="py-24 md:py-32 bg-muted/40">
+      {/* Catálogo */}
+      <section id="catalogo" className="py-24 md:py-32 bg-muted/40">
         <div className="px-6 md:px-24 max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10">
             <div>
-              <h2 className="font-[var(--font-display)] text-4xl md:text-5xl mb-4">
-                La Colección
+              <span className="font-[var(--font-mono)] text-[10px] uppercase tracking-widest text-primary">
+                Tienda
+              </span>
+              <h2 className="font-[var(--font-display)] text-4xl md:text-5xl mt-3">
+                Catálogo
               </h2>
-              <p className="text-foreground/60 text-sm font-[var(--font-mono)] uppercase tracking-widest">
-                Filtrar por familia olfativa
+              <p className="text-foreground/60 text-sm mt-2">
+                Explorá las fragancias por nombre, familia olfativa o nota.
               </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              {families.map((f, i) => (
-                <button
-                  key={f}
-                  className={`px-4 py-2 border text-[10px] uppercase tracking-widest transition-colors ${
-                    i === 0
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border hover:border-foreground"
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-16">
-            {products.map((p) => (
-              <article key={p.name} className="group cursor-pointer">
-                <div className="relative aspect-[3/4] mb-6 overflow-hidden bg-stone-100 ring-1 ring-black/5">
-                  <img
-                    src={p.img}
-                    alt={p.name}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-background/90 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-center px-8 text-center">
-                    <p className="font-[var(--font-mono)] text-[9px] uppercase tracking-widest mb-4">
-                      Notas principales
-                    </p>
-                    <p className="text-sm italic font-[var(--font-display)]">
-                      {p.notes}
-                    </p>
-                  </div>
-                </div>
-                <h3 className="font-[var(--font-display)] text-2xl mb-1">
-                  {p.name}
-                </h3>
-                <p className="font-[var(--font-mono)] text-[10px] uppercase tracking-widest text-foreground/50 mb-4">
-                  {p.family}
-                </p>
-                <p className="text-sm font-medium">{p.price}</p>
-              </article>
-            ))}
+          {/* Toolbar: buscar, filtrar, ordenar */}
+          <div className="flex flex-col gap-6 mb-12 pb-6 border-b border-border">
+            <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+              <label className="relative w-full md:max-w-sm">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-foreground/40"
+                  strokeWidth={1.5}
+                />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Buscar por nombre o nota olfativa"
+                  className="w-full pl-10 pr-4 py-3 bg-background border border-border text-sm placeholder:text-foreground/40 focus:outline-none focus:border-foreground transition-colors"
+                />
+              </label>
+
+              <div className="flex items-center gap-3">
+                <label className="font-[var(--font-mono)] text-[10px] uppercase tracking-widest text-foreground/60">
+                  Ordenar
+                </label>
+                <select
+                  value={sortKey}
+                  onChange={(e) => setSortKey(e.target.value as SortKey)}
+                  className="bg-background border border-border px-4 py-3 text-sm focus:outline-none focus:border-foreground transition-colors min-w-[14rem]"
+                >
+                  {sortOptions.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <span className="font-[var(--font-mono)] text-[10px] uppercase tracking-widest text-foreground/60 self-center mr-2">
+                Filtrar
+              </span>
+              {families.map((f) => {
+                const active = f === activeFamily;
+                return (
+                  <button
+                    key={f}
+                    onClick={() => setActiveFamily(f)}
+                    className={`px-4 py-2 border text-[10px] uppercase tracking-widest transition-colors ${
+                      active
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-border hover:border-foreground"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                );
+              })}
+            </div>
+
+            <p className="font-[var(--font-mono)] text-[10px] uppercase tracking-widest text-foreground/50">
+              {filtered.length}{" "}
+              {filtered.length === 1 ? "fragancia" : "fragancias"}
+            </p>
           </div>
+
+          {filtered.length === 0 ? (
+            <div className="text-center py-24">
+              <p className="font-[var(--font-display)] text-2xl italic mb-2">
+                Sin resultados
+              </p>
+              <p className="text-sm text-foreground/60">
+                Probá con otra búsqueda o quitá los filtros.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+              {filtered.map((p) => (
+                <article key={p.name} className="group cursor-pointer">
+                  <div className="relative aspect-[3/4] mb-6 overflow-hidden bg-stone-100 ring-1 ring-black/5">
+                    <img
+                      src={p.img}
+                      alt={p.name}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-background/90 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-center px-8 text-center">
+                      <p className="font-[var(--font-mono)] text-[9px] uppercase tracking-widest mb-4">
+                        Notas principales
+                      </p>
+                      <p className="text-sm italic font-[var(--font-display)]">
+                        {p.notes}
+                      </p>
+                    </div>
+                  </div>
+                  <h3 className="font-[var(--font-display)] text-2xl mb-1">
+                    {p.name}
+                  </h3>
+                  <p className="font-[var(--font-mono)] text-[10px] uppercase tracking-widest text-foreground/50 mb-4">
+                    {p.family} • {p.gender}
+                  </p>
+                  <p className="text-sm font-medium">{formatPrice(p.price)}</p>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </section>
+
 
       {/* Ficha destacada */}
       <section
