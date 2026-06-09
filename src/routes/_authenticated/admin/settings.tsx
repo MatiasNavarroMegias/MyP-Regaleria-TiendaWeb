@@ -62,10 +62,13 @@ function Section({ title, table, hasPrice }: { title: string; table: "payment_me
 
   const add = useMutation({
     mutationFn: async () => {
-      const payload: Record<string, unknown> = { name: adding, enabled: true };
-      if (hasPrice) payload.price = addPrice;
-      const { error } = await supabase.from(table).insert(payload as never);
-      if (error) throw error;
+      if (hasPrice) {
+        const { error } = await supabase.from("shipping_options").insert({ name: adding, price: addPrice, enabled: true });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("payment_methods").insert({ name: adding, enabled: true });
+        if (error) throw error;
+      }
     },
     onSuccess: () => { setAdding(""); setAddPrice(0); qc.invalidateQueries({ queryKey: [table] }); toast.success("Agregado"); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),

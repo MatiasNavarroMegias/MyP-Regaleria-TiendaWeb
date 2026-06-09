@@ -1,8 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { MessageCircle } from "lucide-react";
 import type { ReactNode } from "react";
+import { useAuth, useIsAdmin } from "@/hooks/useAuth";
 
 export function SiteChrome({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
+  const { data: isAdmin } = useIsAdmin();
   return (
     <div className="bg-background text-foreground font-[var(--font-body)]">
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-12 py-5 bg-background/80 backdrop-blur-md border-b border-border">
@@ -15,9 +18,10 @@ export function SiteChrome({ children }: { children: ReactNode }) {
           <Link to="/esencia" activeProps={{ className: "text-primary" }} className="hover:text-primary transition-colors">Nuestra Esencia</Link>
           <Link to="/destacado" activeProps={{ className: "text-primary" }} className="hover:text-primary transition-colors">Destacado</Link>
         </div>
-        <button className="text-[11px] uppercase tracking-widest hover:text-primary transition-colors">
-          Carrito (0)
-        </button>
+        <div className="flex items-center gap-4 text-[11px] uppercase tracking-widest">
+          {isAdmin && <Link to="/admin" className="hover:text-primary transition-colors">Admin</Link>}
+          {!user && <Link to="/auth" className="hover:text-primary transition-colors">Ingresar</Link>}
+        </div>
       </nav>
 
       {children}
