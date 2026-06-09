@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Search } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import hero from "@/assets/hero.jpg";
 import workshop from "@/assets/workshop.jpg";
@@ -35,33 +36,105 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const families = ["Todos", "Amaderados", "Florales", "Cítricos", "Orientales"];
+type Family = "Amaderados" | "Florales" | "Cítricos" | "Orientales";
+const families: Array<"Todos" | Family> = [
+  "Todos",
+  "Amaderados",
+  "Florales",
+  "Cítricos",
+  "Orientales",
+];
 
-const products = [
+type Product = {
+  name: string;
+  family: Family;
+  gender: string;
+  notes: string;
+  price: number;
+  img: string;
+};
+
+const products: Product[] = [
   {
     name: "Bruma pampeana",
-    family: "Amaderado • Unisex",
+    family: "Amaderados",
+    gender: "Unisex",
     notes: "Sándalo, Cardamomo, Cedro de Virginia",
-    price: "$85.000 ARS",
+    price: 85000,
     img: perfume1,
   },
   {
     name: "Jardín secreto",
-    family: "Floral • Femenino",
+    family: "Florales",
+    gender: "Femenino",
     notes: "Jazmín del Cabo, Bergamota, Almizcle",
-    price: "$72.500 ARS",
+    price: 72500,
     img: perfume2,
   },
   {
     name: "Noche eterna",
-    family: "Oriental • Intenso",
+    family: "Orientales",
+    gender: "Intenso",
     notes: "Incienso, Vainilla negra, Cuero",
-    price: "$94.000 ARS",
+    price: 94000,
     img: perfume3,
+  },
+  {
+    name: "Amanecer cítrico",
+    family: "Cítricos",
+    gender: "Unisex",
+    notes: "Pomelo rosado, Mandarina, Neroli",
+    price: 78000,
+    img: featured,
+  },
+  {
+    name: "Sur profundo",
+    family: "Amaderados",
+    gender: "Masculino",
+    notes: "Vetiver, Pino, Tierra húmeda",
+    price: 88500,
+    img: perfume3,
+  },
+  {
+    name: "Flor de invierno",
+    family: "Florales",
+    gender: "Femenino",
+    notes: "Tuberosa, Iris, Musgo blanco",
+    price: 76000,
+    img: perfume2,
+  },
+  {
+    name: "Ámbar de oriente",
+    family: "Orientales",
+    gender: "Unisex",
+    notes: "Ámbar gris, Benjuí, Mirra",
+    price: 96500,
+    img: perfume1,
+  },
+  {
+    name: "Mediodía de limonero",
+    family: "Cítricos",
+    gender: "Unisex",
+    notes: "Limón Siciliano, Verbena, Albahaca",
+    price: 69000,
+    img: featured,
   },
 ];
 
+const sortOptions = [
+  { value: "destacados", label: "Destacados" },
+  { value: "precio-asc", label: "Precio: menor a mayor" },
+  { value: "precio-desc", label: "Precio: mayor a menor" },
+  { value: "alfabetico", label: "Alfabético (A-Z)" },
+] as const;
+
+type SortKey = (typeof sortOptions)[number]["value"];
+
+const formatPrice = (n: number) =>
+  `$${n.toLocaleString("es-AR")} ARS`;
+
 const igGrid = [ig1, ig2, ig3, ig4, ig5, ig6];
+
 
 function Index() {
   return (
