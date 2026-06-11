@@ -38,7 +38,10 @@ function Section({ title, table, hasPrice }: { title: string; table: "payment_me
 
   const toggle = useMutation({
     mutationFn: async ({ id, enabled }: { id: string; enabled: boolean }) => {
-      const { error } = await supabase.from(table).update({ enabled }).eq("id", id);
+      const q = table === "payment_methods"
+        ? supabase.from("payment_methods").update({ enabled }).eq("id", id)
+        : supabase.from("shipping_options").update({ enabled }).eq("id", id);
+      const { error } = await q;
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: [table] }),
@@ -46,7 +49,7 @@ function Section({ title, table, hasPrice }: { title: string; table: "payment_me
 
   const updatePrice = useMutation({
     mutationFn: async ({ id, price }: { id: string; price: number }) => {
-      const { error } = await supabase.from(table).update({ price }).eq("id", id);
+      const { error } = await supabase.from("shipping_options").update({ price }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: [table] }),
