@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Star, MessageCircle } from "lucide-react";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ProductCard } from "@/components/ProductCard";
-import { findProduct, formatPrice, products } from "@/lib/products";
+import { findProduct, formatPrice, products, type Review } from "@/lib/products";
 
 export const Route = createFileRoute("/producto/$slug")({
   loader: ({ params }) => {
@@ -45,8 +45,9 @@ function ProductDetail() {
   const { product: p } = Route.useLoaderData();
   const related = products.filter((x) => x.family === p.family && x.slug !== p.slug).slice(0, 3);
 
-  const avg = p.reviews.length
-    ? p.reviews.reduce((s, r) => s + r.rating, 0) / p.reviews.length
+  const reviews = p.reviews as Review[];
+  const avg = reviews.length
+    ? reviews.reduce((s: number, r: Review) => s + r.rating, 0) / reviews.length
     : 0;
 
   const waLink = `https://wa.me/5491100000000?text=${encodeURIComponent(`Hola Natalia, me interesa "${p.name}".`)}`;
@@ -121,11 +122,11 @@ function ProductDetail() {
 
           <div className="mt-24 md:mt-32">
             <h2 className="font-[var(--font-display)] text-3xl mb-10">Opiniones</h2>
-            {p.reviews.length === 0 ? (
+            {reviews.length === 0 ? (
               <p className="text-sm text-foreground/60 italic">Todavía no hay opiniones para esta fragancia.</p>
             ) : (
               <ul className="grid md:grid-cols-2 gap-8">
-                {p.reviews.map((rv, i) => (
+                {reviews.map((rv: Review, i: number) => (
                   <li key={i} className="border-t border-border pt-6">
                     <div className="flex gap-0.5 mb-3">
                       {Array.from({ length: 5 }).map((_, j) => (
