@@ -22,6 +22,7 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminProductsRouteImport } from './routes/_authenticated/admin/products'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin/orders'
 import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated/admin/content'
+import { Route as AuthenticatedAdminAparienciaRouteImport } from './routes/_authenticated/admin/apariencia'
 
 const EsenciaRoute = EsenciaRouteImport.update({
   id: '/esencia',
@@ -91,6 +92,12 @@ const AuthenticatedAdminContentRoute =
     path: '/content',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminAparienciaRoute =
+  AuthenticatedAdminAparienciaRouteImport.update({
+    id: '/apariencia',
+    path: '/apariencia',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/esencia': typeof EsenciaRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/producto/$slug': typeof ProductoSlugRoute
+  '/admin/apariencia': typeof AuthenticatedAdminAparienciaRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/products': typeof AuthenticatedAdminProductsRoute
@@ -113,6 +121,7 @@ export interface FileRoutesByTo {
   '/destacado': typeof DestacadoRoute
   '/esencia': typeof EsenciaRoute
   '/producto/$slug': typeof ProductoSlugRoute
+  '/admin/apariencia': typeof AuthenticatedAdminAparienciaRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/products': typeof AuthenticatedAdminProductsRoute
@@ -129,6 +138,7 @@ export interface FileRoutesById {
   '/esencia': typeof EsenciaRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/producto/$slug': typeof ProductoSlugRoute
+  '/_authenticated/admin/apariencia': typeof AuthenticatedAdminAparienciaRoute
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/products': typeof AuthenticatedAdminProductsRoute
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
     | '/esencia'
     | '/admin'
     | '/producto/$slug'
+    | '/admin/apariencia'
     | '/admin/content'
     | '/admin/orders'
     | '/admin/products'
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | '/destacado'
     | '/esencia'
     | '/producto/$slug'
+    | '/admin/apariencia'
     | '/admin/content'
     | '/admin/orders'
     | '/admin/products'
@@ -173,6 +185,7 @@ export interface FileRouteTypes {
     | '/esencia'
     | '/_authenticated/admin'
     | '/producto/$slug'
+    | '/_authenticated/admin/apariencia'
     | '/_authenticated/admin/content'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/products'
@@ -283,10 +296,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminContentRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/apariencia': {
+      id: '/_authenticated/admin/apariencia'
+      path: '/apariencia'
+      fullPath: '/admin/apariencia'
+      preLoaderRoute: typeof AuthenticatedAdminAparienciaRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminAparienciaRoute: typeof AuthenticatedAdminAparienciaRoute
   AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminProductsRoute: typeof AuthenticatedAdminProductsRoute
@@ -296,6 +317,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminAparienciaRoute: AuthenticatedAdminAparienciaRoute,
     AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
     AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
     AuthenticatedAdminProductsRoute: AuthenticatedAdminProductsRoute,

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LayoutDashboard, Package, FileText, Settings, ShoppingBag, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Package, FileText, Settings, ShoppingBag, LogOut, ExternalLink, Palette } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { useIsAdmin } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,11 +10,12 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminLayout,
 });
 
-type NavItem = { to: "/admin" | "/admin/products" | "/admin/content" | "/admin/orders" | "/admin/settings"; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+type NavItem = { to: "/admin" | "/admin/products" | "/admin/content" | "/admin/apariencia" | "/admin/orders" | "/admin/settings"; label: string; icon: typeof LayoutDashboard; exact?: boolean };
 const navItems: NavItem[] = [
   { to: "/admin", label: "Resumen", icon: LayoutDashboard, exact: true },
   { to: "/admin/products", label: "Productos", icon: Package },
   { to: "/admin/content", label: "Contenido", icon: FileText },
+  { to: "/admin/apariencia", label: "Apariencia", icon: Palette },
   { to: "/admin/orders", label: "Pedidos", icon: ShoppingBag },
   { to: "/admin/settings", label: "Pagos y envíos", icon: Settings },
 ];
