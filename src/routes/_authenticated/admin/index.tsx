@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Package, FileText, ShoppingBag, Settings } from "lucide-react";
+import { Package, FileText, ShoppingBag, Settings, Palette } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
@@ -32,7 +32,8 @@ function AdminHome() {
 
   const links = [
     { to: "/admin/products", label: "Gestionar productos", icon: Package, desc: "Agregar, editar y eliminar fragancias" },
-    { to: "/admin/content", label: "Contenido del sitio", icon: FileText, desc: "Editar hero, esencia y datos de contacto" },
+    { to: "/admin/content", label: "Contenido del sitio", icon: FileText, desc: "Editar banner, categorías, contacto y footer" },
+    { to: "/admin/apariencia", label: "Apariencia y colores", icon: Palette, desc: "Personalizar la paleta de colores del sitio" },
     { to: "/admin/orders", label: "Pedidos", icon: ShoppingBag, desc: "Cargar y actualizar pedidos manuales" },
     { to: "/admin/settings", label: "Pagos y envíos", icon: Settings, desc: "Activar métodos de pago y opciones de envío" },
   ] as const;

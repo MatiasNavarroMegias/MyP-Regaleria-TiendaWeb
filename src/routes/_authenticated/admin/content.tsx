@@ -22,13 +22,61 @@ const SECTIONS: Section[] = [
   },
   {
     key: "hero",
-    label: "Hero principal",
+    label: "Banner principal (Hero)",
     fields: [
       { name: "title", label: "Título", type: "textarea" },
       { name: "subtitle", label: "Subtítulo", type: "textarea" },
       { name: "cta_label", label: "Texto del botón" },
       { name: "cta_link", label: "Link del botón" },
       { name: "image_url", label: "Imagen de fondo (URL)", type: "url" },
+    ],
+  },
+  {
+    key: "featured_section",
+    label: "Sección de productos destacados",
+    fields: [
+      { name: "eyebrow", label: "Etiqueta superior" },
+      { name: "title", label: "Título" },
+    ],
+  },
+  {
+    key: "categories_section",
+    label: "Sección de categorías",
+    fields: [
+      { name: "eyebrow", label: "Etiqueta superior" },
+      { name: "title", label: "Título" },
+    ],
+  },
+  {
+    key: "category_amaderados",
+    label: "Categoría · Amaderados",
+    fields: [
+      { name: "tagline", label: "Bajada" },
+      { name: "image_url", label: "Imagen de portada", type: "url" },
+    ],
+  },
+  {
+    key: "category_florales",
+    label: "Categoría · Florales",
+    fields: [
+      { name: "tagline", label: "Bajada" },
+      { name: "image_url", label: "Imagen de portada", type: "url" },
+    ],
+  },
+  {
+    key: "category_orientales",
+    label: "Categoría · Orientales",
+    fields: [
+      { name: "tagline", label: "Bajada" },
+      { name: "image_url", label: "Imagen de portada", type: "url" },
+    ],
+  },
+  {
+    key: "category_citricos",
+    label: "Categoría · Cítricos",
+    fields: [
+      { name: "tagline", label: "Bajada" },
+      { name: "image_url", label: "Imagen de portada", type: "url" },
     ],
   },
   {
@@ -46,17 +94,32 @@ const SECTIONS: Section[] = [
     key: "contact",
     label: "Contacto",
     fields: [
+      { name: "eyebrow", label: "Etiqueta superior" },
+      { name: "title", label: "Título" },
+      { name: "description", label: "Descripción", type: "textarea" },
       { name: "email", label: "Email" },
       { name: "whatsapp", label: "WhatsApp (solo números, con código país)" },
+      { name: "whatsapp_message", label: "Mensaje pre-llenado de WhatsApp" },
       { name: "instagram", label: "URL de Instagram" },
       { name: "instagram_handle", label: "Usuario IG" },
       { name: "city", label: "Ciudad" },
     ],
   },
   {
+    key: "shipping_bar",
+    label: "Barra de envíos",
+    fields: [{ name: "text", label: "Texto" }],
+  },
+  {
     key: "footer",
     label: "Footer",
-    fields: [{ name: "description", label: "Descripción", type: "textarea" }],
+    fields: [
+      { name: "description", label: "Descripción", type: "textarea" },
+      { name: "info_title", label: "Título columna info" },
+      { name: "info_link_1", label: "Link 1" },
+      { name: "info_link_2", label: "Link 2" },
+      { name: "info_link_3", label: "Link 3" },
+    ],
   },
 ];
 
