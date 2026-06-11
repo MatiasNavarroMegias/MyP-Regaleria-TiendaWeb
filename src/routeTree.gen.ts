@@ -15,6 +15,7 @@ import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProductoSlugRouteImport } from './routes/producto.$slug'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
@@ -49,6 +50,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductoSlugRoute = ProductoSlugRouteImport.update({
+  id: '/producto/$slug',
+  path: '/producto/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/destacado': typeof DestacadoRoute
   '/esencia': typeof EsenciaRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/producto/$slug': typeof ProductoSlugRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/products': typeof AuthenticatedAdminProductsRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/catalogo': typeof CatalogoRoute
   '/destacado': typeof DestacadoRoute
   '/esencia': typeof EsenciaRoute
+  '/producto/$slug': typeof ProductoSlugRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/products': typeof AuthenticatedAdminProductsRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/destacado': typeof DestacadoRoute
   '/esencia': typeof EsenciaRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/producto/$slug': typeof ProductoSlugRoute
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/products': typeof AuthenticatedAdminProductsRoute
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/destacado'
     | '/esencia'
     | '/admin'
+    | '/producto/$slug'
     | '/admin/content'
     | '/admin/orders'
     | '/admin/products'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/destacado'
     | '/esencia'
+    | '/producto/$slug'
     | '/admin/content'
     | '/admin/orders'
     | '/admin/products'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/destacado'
     | '/esencia'
     | '/_authenticated/admin'
+    | '/producto/$slug'
     | '/_authenticated/admin/content'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/products'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   CatalogoRoute: typeof CatalogoRoute
   DestacadoRoute: typeof DestacadoRoute
   EsenciaRoute: typeof EsenciaRoute
+  ProductoSlugRoute: typeof ProductoSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -219,6 +232,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/producto/$slug': {
+      id: '/producto/$slug'
+      path: '/producto/$slug'
+      fullPath: '/producto/$slug'
+      preLoaderRoute: typeof ProductoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -306,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogoRoute: CatalogoRoute,
   DestacadoRoute: DestacadoRoute,
   EsenciaRoute: EsenciaRoute,
+  ProductoSlugRoute: ProductoSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
