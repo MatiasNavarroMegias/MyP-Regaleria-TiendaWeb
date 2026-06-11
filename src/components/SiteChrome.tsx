@@ -2,15 +2,31 @@ import { Link } from "@tanstack/react-router";
 import { MessageCircle } from "lucide-react";
 import type { ReactNode } from "react";
 import { useAuth, useIsAdmin } from "@/hooks/useAuth";
+import { useSiteContent, pickString } from "@/lib/site-content";
 
 export function SiteChrome({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const { data: isAdmin } = useIsAdmin();
+  const { data: content } = useSiteContent();
+  const c = content ?? {};
+  const brand = (c.brand ?? {}) as Record<string, string>;
+  const contact = (c.contact ?? {}) as Record<string, string>;
+  const footer = (c.footer ?? {}) as Record<string, string>;
+  const shipping = (c.shipping_bar ?? {}) as Record<string, string>;
+
+  const brandName = pickString(brand.name, "NATALIA SANTOS");
+  const email = pickString(contact.email, "hola@nataliasantos.com.ar");
+  const city = pickString(contact.city, "Buenos Aires, Argentina");
+  const igUrl = pickString(contact.instagram, "https://www.instagram.com/nataliasantos.1701");
+  const igHandle = pickString(contact.instagram_handle, "@nataliasantos.1701");
+  const whatsappNum = pickString(contact.whatsapp, "5491100000000");
+  const whatsappMsg = encodeURIComponent(pickString(contact.whatsapp_message, "Hola, me gustaría una asesoría de aromas"));
+
   return (
     <div className="bg-background text-foreground font-[var(--font-body)]">
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-12 py-5 bg-background/80 backdrop-blur-md border-b border-border">
         <Link to="/" className="font-[var(--font-display)] text-xl tracking-tight">
-          NATALIA SANTOS
+          {brandName}
         </Link>
         <div className="hidden md:flex gap-10 text-[11px] uppercase tracking-[0.2em] font-medium">
           <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: "text-primary" }} className="hover:text-primary transition-colors">Inicio</Link>
@@ -28,7 +44,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
 
       <section className="bg-primary/15 py-6 border-y border-border">
         <p className="text-center font-[var(--font-mono)] text-[11px] uppercase tracking-[0.25em]">
-          Envíos seguros a todo el país vía Correo Argentino
+          {pickString(shipping.text, "Envíos seguros a todo el país vía Correo Argentino")}
         </p>
       </section>
 
@@ -37,27 +53,28 @@ export function SiteChrome({ children }: { children: ReactNode }) {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
             <div className="col-span-1 md:col-span-2">
               <span className="font-[var(--font-display)] text-3xl text-background tracking-tight block mb-6">
-                NATALIA SANTOS
+                {brandName}
               </span>
               <p className="text-sm max-w-sm leading-relaxed">
-                Fragancias de autor maceradas artesanalmente en Buenos Aires.
-                Suscribite para enterarte de cada lanzamiento.
+                {pickString(footer.description, "Fragancias de autor maceradas artesanalmente en Buenos Aires. Suscribite para enterarte de cada lanzamiento.")}
               </p>
             </div>
             <div>
-              <h4 className="text-[10px] uppercase tracking-widest text-background mb-6">Información</h4>
+              <h4 className="text-[10px] uppercase tracking-widest text-background mb-6">
+                {pickString(footer.info_title, "Información")}
+              </h4>
               <ul className="space-y-3 text-xs">
-                <li><a href="#" className="hover:text-background transition-colors">Envíos y Devoluciones</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Cuidado del perfume</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Preguntas Frecuentes</a></li>
+                <li><span className="hover:text-background transition-colors">{pickString(footer.info_link_1, "Envíos y Devoluciones")}</span></li>
+                <li><span className="hover:text-background transition-colors">{pickString(footer.info_link_2, "Cuidado del perfume")}</span></li>
+                <li><span className="hover:text-background transition-colors">{pickString(footer.info_link_3, "Preguntas Frecuentes")}</span></li>
               </ul>
             </div>
             <div>
               <h4 className="text-[10px] uppercase tracking-widest text-background mb-6">Contacto</h4>
-              <p className="text-xs mb-3">hola@nataliasantos.com.ar</p>
-              <p className="text-xs mb-3">Buenos Aires, Argentina</p>
-              <a href="https://www.instagram.com/nataliasantos.1701" target="_blank" rel="noreferrer noopener" className="text-xs underline-offset-4 hover:underline">
-                @nataliasantos.1701
+              <p className="text-xs mb-3">{email}</p>
+              <p className="text-xs mb-3">{city}</p>
+              <a href={igUrl} target="_blank" rel="noreferrer noopener" className="text-xs underline-offset-4 hover:underline">
+                {igHandle}
               </a>
             </div>
           </div>
@@ -69,14 +86,14 @@ export function SiteChrome({ children }: { children: ReactNode }) {
               <span className="text-[9px] uppercase tracking-widest opacity-50">Correo Argentino</span>
             </div>
             <p className="text-[9px] uppercase tracking-widest opacity-30 text-center">
-              © {new Date().getFullYear()} Natalia Santos — Perfumería de Autor
+              © {new Date().getFullYear()} {brandName}
             </p>
           </div>
         </div>
       </footer>
 
       <a
-        href="https://wa.me/5491100000000?text=Hola%20Natalia%2C%20me%20gustar%C3%ADa%20una%20asesor%C3%ADa%20de%20aromas"
+        href={`https://wa.me/${whatsappNum}?text=${whatsappMsg}`}
         target="_blank"
         rel="noreferrer noopener"
         aria-label="Consultar por WhatsApp"
