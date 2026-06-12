@@ -42,11 +42,31 @@ export function SiteChrome({ children }: { children: ReactNode }) {
 
       {children}
 
+      {user && (
+        <section className="bg-foreground text-background py-6 px-6 md:px-12">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-[11px] uppercase tracking-[0.2em]">
+              Sesión iniciada como <span className="opacity-70">{user.email}</span>
+              {isAdmin && <span className="ml-2 px-2 py-0.5 bg-primary text-primary-foreground text-[9px] tracking-widest">ADMIN</span>}
+            </p>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="px-6 py-3 bg-primary text-primary-foreground text-[11px] uppercase tracking-[0.2em] hover:opacity-90 transition-opacity"
+              >
+                Panel Admin →
+              </Link>
+            )}
+          </div>
+        </section>
+      )}
+
       <section className="bg-primary/15 py-6 border-y border-border">
         <p className="text-center font-[var(--font-mono)] text-[11px] uppercase tracking-[0.25em]">
           {pickString(shipping.text, "Envíos seguros a todo el país vía Correo Argentino")}
         </p>
       </section>
+
 
       <footer className="bg-foreground text-background/80 py-20 px-6 md:px-24">
         <div className="max-w-7xl mx-auto">
