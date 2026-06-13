@@ -35,6 +35,7 @@ type SortKey = (typeof sortOptions)[number]["value"];
 
 function Catalogo() {
   const { familia } = Route.useSearch();
+  const { products } = useProducts();
   const [query, setQuery] = useState("");
   const [activeFamily, setActiveFamily] = useState<(typeof families)[number]>(
     (familia as Family) ?? "Todos",
