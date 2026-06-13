@@ -15,6 +15,8 @@ function mapRow(row: Record<string, unknown>): Product {
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
+  const imagesArr = Array.isArray(row.images) ? (row.images as string[]).filter(Boolean) : [];
+  const mainImg = (row.image_url as string) || imagesArr[0] || fallbackImg;
   return {
     slug,
     name: String(row.name ?? ""),
@@ -23,7 +25,8 @@ function mapRow(row: Record<string, unknown>): Product {
     notes: String(row.notes_text ?? ""),
     price: Number(row.price ?? 0),
     stock: Number(row.stock ?? 0),
-    img: (row.image_url as string) || fallbackImg,
+    img: mainImg,
+    images: imagesArr.length ? imagesArr : (row.image_url ? [String(row.image_url)] : []),
     description: String(row.description ?? ""),
     reviews: [],
   };
