@@ -74,9 +74,7 @@ function ProductDetail() {
           </Link>
 
           <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-start">
-            <div className="aspect-[3/4] overflow-hidden bg-stone-100 ring-1 ring-black/5">
-              <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
-            </div>
+            <ProductGallery images={p.images && p.images.length ? p.images : [p.img]} name={p.name} />
 
             <div>
               <span className="font-[var(--font-mono)] text-[10px] uppercase tracking-widest text-primary">
