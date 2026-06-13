@@ -59,7 +59,7 @@ function Catalogo() {
       case "alfabetico": list = [...list].sort((a, b) => a.name.localeCompare(b.name, "es")); break;
     }
     return list;
-  }, [query, activeFamily, sortKey]);
+  }, [query, activeFamily, sortKey, products]);
 
   return (
     <SiteChrome>
