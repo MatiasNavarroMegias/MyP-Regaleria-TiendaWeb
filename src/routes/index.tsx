@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ProductCard } from "@/components/ProductCard";
-import { products, type Family } from "@/lib/products";
+import { type Family } from "@/lib/products";
+import { useProducts } from "@/lib/useProducts";
 import { useSiteContent, pickString, resolveImage } from "@/lib/site-content";
 import hero from "@/assets/hero.jpg";
 import perfume1 from "@/assets/perfume-1.jpg";
