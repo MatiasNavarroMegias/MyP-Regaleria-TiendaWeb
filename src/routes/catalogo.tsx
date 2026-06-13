@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { z } from "zod";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ProductCard } from "@/components/ProductCard";
-import { products, families, type Family } from "@/lib/products";
+import { families, type Family } from "@/lib/products";
+import { useProducts } from "@/lib/useProducts";
 
 const searchSchema = z.object({
   familia: z.enum(["Amaderados", "Florales", "Cítricos", "Orientales"]).optional(),
@@ -34,6 +35,7 @@ type SortKey = (typeof sortOptions)[number]["value"];
 
 function Catalogo() {
   const { familia } = Route.useSearch();
+  const { products } = useProducts();
   const [query, setQuery] = useState("");
   const [activeFamily, setActiveFamily] = useState<(typeof families)[number]>(
     (familia as Family) ?? "Todos",
@@ -57,7 +59,7 @@ function Catalogo() {
       case "alfabetico": list = [...list].sort((a, b) => a.name.localeCompare(b.name, "es")); break;
     }
     return list;
-  }, [query, activeFamily, sortKey]);
+  }, [query, activeFamily, sortKey, products]);
 
   return (
     <SiteChrome>

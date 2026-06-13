@@ -1,28 +1,17 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Star, MessageCircle } from "lucide-react";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ProductCard } from "@/components/ProductCard";
-import { findProduct, formatPrice, products, type Review } from "@/lib/products";
+import { formatPrice, type Review } from "@/lib/products";
+import { useProduct } from "@/lib/useProducts";
 
 export const Route = createFileRoute("/producto/$slug")({
-  loader: ({ params }) => {
-    const product = findProduct(params.slug);
-    if (!product) throw notFound();
-    return { product };
-  },
-  head: ({ loaderData }) => {
-    const p = loaderData?.product;
-    if (!p) return { meta: [{ title: "Producto — Natalia Santos" }] };
-    return {
-      meta: [
-        { title: `${p.name} — Natalia Santos` },
-        { name: "description", content: p.description.slice(0, 160) },
-        { property: "og:title", content: `${p.name} — Natalia Santos` },
-        { property: "og:description", content: p.description.slice(0, 160) },
-        { property: "og:image", content: p.img },
-      ],
-    };
-  },
+  head: ({ params }) => ({
+    meta: [
+      { title: `${params.slug} — Natalia Santos` },
+      { property: "og:title", content: `${params.slug} — Natalia Santos` },
+    ],
+  }),
   notFoundComponent: () => (
     <SiteChrome>
       <section className="py-32 text-center px-6">
@@ -42,7 +31,30 @@ export const Route = createFileRoute("/producto/$slug")({
 });
 
 function ProductDetail() {
-  const { product: p } = Route.useLoaderData();
+  const { slug } = Route.useParams();
+  const { product: p, products, isLoading } = useProduct(slug);
+
+  if (isLoading && !p) {
+    return (
+      <SiteChrome>
+        <section className="py-32 text-center px-6">
+          <p className="font-[var(--font-display)] text-2xl italic text-foreground/60">Cargando…</p>
+        </section>
+      </SiteChrome>
+    );
+  }
+
+  if (!p) {
+    return (
+      <SiteChrome>
+        <section className="py-32 text-center px-6">
+          <p className="font-[var(--font-display)] text-3xl italic mb-4">Fragancia no encontrada</p>
+          <Link to="/catalogo" className="font-[var(--font-mono)] text-[10px] uppercase tracking-widest underline">Volver al catálogo</Link>
+        </section>
+      </SiteChrome>
+    );
+  }
+
   const related = products.filter((x) => x.family === p.family && x.slug !== p.slug).slice(0, 3);
 
   const reviews = p.reviews as Review[];
