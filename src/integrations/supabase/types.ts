@@ -143,6 +143,7 @@ export type Database = {
           heart_notes: string | null
           id: string
           image_url: string | null
+          images: string[]
           name: string
           notes_text: string | null
           price: number
@@ -162,6 +163,7 @@ export type Database = {
           heart_notes?: string | null
           id?: string
           image_url?: string | null
+          images?: string[]
           name: string
           notes_text?: string | null
           price?: number
@@ -181,6 +183,7 @@ export type Database = {
           heart_notes?: string | null
           id?: string
           image_url?: string | null
+          images?: string[]
           name?: string
           notes_text?: string | null
           price?: number
