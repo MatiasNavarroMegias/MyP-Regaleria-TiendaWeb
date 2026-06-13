@@ -39,10 +39,7 @@ function Index() {
   const contactC = (c.contact ?? {}) as Record<string, string>;
 
   const { products } = useProducts();
-  const featuredList = products.filter((p) => products.indexOf(p) < 4);
-  const destacados = (products.filter((p) => (p as unknown as { featured?: boolean }).featured).length > 0
-    ? products.filter((p) => (p as unknown as { featured?: boolean }).featured)
-    : featuredList).slice(0, 4);
+  const destacados = products.slice(0, 4);
   const heroImg = resolveImage(heroC.image_url, hero);
   const heroTitle = pickString(heroC.title, "Fragancias que cuentan tu historia");
   const ctaLabel = pickString(heroC.cta_label, "Comprar ahora");
