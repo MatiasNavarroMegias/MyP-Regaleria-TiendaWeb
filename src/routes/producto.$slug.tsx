@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Star, MessageCircle } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Star, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ProductCard } from "@/components/ProductCard";
 import { formatPrice, type Review } from "@/lib/products";
@@ -73,9 +74,7 @@ function ProductDetail() {
           </Link>
 
           <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-start">
-            <div className="aspect-[3/4] overflow-hidden bg-stone-100 ring-1 ring-black/5">
-              <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
-            </div>
+            <ProductGallery images={p.images && p.images.length ? p.images : [p.img]} name={p.name} />
 
             <div>
               <span className="font-[var(--font-mono)] text-[10px] uppercase tracking-widest text-primary">
@@ -166,5 +165,44 @@ function ProductDetail() {
         </div>
       </section>
     </SiteChrome>
+  );
+}
+
+function ProductGallery({ images, name }: { images: string[]; name: string }) {
+  const [idx, setIdx] = useState(0);
+  const safe = images.length ? images : [""];
+  const current = safe[Math.min(idx, safe.length - 1)];
+  const prev = () => setIdx((i) => (i - 1 + safe.length) % safe.length);
+  const next = () => setIdx((i) => (i + 1) % safe.length);
+  return (
+    <div>
+      <div className="relative aspect-[3/4] overflow-hidden bg-stone-100 ring-1 ring-black/5 group">
+        <img src={current} alt={name} className="w-full h-full object-cover" />
+        {safe.length > 1 && (
+          <>
+            <button onClick={prev} aria-label="Anterior" className="absolute left-3 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background size-10 rounded-full flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition">
+              <ChevronLeft className="size-5" strokeWidth={1.5} />
+            </button>
+            <button onClick={next} aria-label="Siguiente" className="absolute right-3 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background size-10 rounded-full flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition">
+              <ChevronRight className="size-5" strokeWidth={1.5} />
+            </button>
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+              {safe.map((_, i) => (
+                <button key={i} onClick={() => setIdx(i)} aria-label={`Foto ${i + 1}`} className={`size-1.5 rounded-full transition ${i === idx ? "bg-foreground w-6" : "bg-foreground/30"}`} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      {safe.length > 1 && (
+        <div className="grid grid-cols-5 gap-2 mt-3">
+          {safe.map((url, i) => (
+            <button key={url + i} onClick={() => setIdx(i)} className={`aspect-square overflow-hidden ring-1 transition ${i === idx ? "ring-foreground" : "ring-black/10 opacity-60 hover:opacity-100"}`}>
+              <img src={url} alt="" className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
