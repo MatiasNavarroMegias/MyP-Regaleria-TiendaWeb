@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { z } from "zod";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ProductCard } from "@/components/ProductCard";
-import { products, families, type Family } from "@/lib/products";
+import { families, type Family } from "@/lib/products";
+import { useProducts } from "@/lib/useProducts";
 
 const searchSchema = z.object({
   familia: z.enum(["Amaderados", "Florales", "Cítricos", "Orientales"]).optional(),
