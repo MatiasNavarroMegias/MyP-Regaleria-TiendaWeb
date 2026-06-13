@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Star, MessageCircle } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Star, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ProductCard } from "@/components/ProductCard";
 import { formatPrice, type Review } from "@/lib/products";
