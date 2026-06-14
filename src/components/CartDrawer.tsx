@@ -23,10 +23,10 @@ export function CartDrawer({ whatsappNumber, brandName }: Props) {
       // Create order in DB (Pendiente, stock NOT decremented yet)
       const { error } = await supabase.rpc("place_order", {
         p_customer_name: form.name,
-        p_customer_phone: form.phone || null,
-        p_customer_email: form.email || null,
-        p_address: form.address || null,
-        p_notes: form.notes || null,
+        p_customer_phone: form.phone || "",
+        p_customer_email: form.email || "",
+        p_address: form.address || "",
+        p_notes: form.notes || "",
         p_items: items.map((i) => ({ product_id: i.id, quantity: i.qty })),
       });
       if (error) throw error;

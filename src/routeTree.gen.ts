@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EsenciaRouteImport } from './routes/esencia'
+import { Route as EnviosRouteImport } from './routes/envios'
 import { Route as DestacadoRouteImport } from './routes/destacado'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -21,12 +23,23 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminProductsRouteImport } from './routes/_authenticated/admin/products'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin/orders'
+import { Route as AuthenticatedAdminFamiliesRouteImport } from './routes/_authenticated/admin/families'
 import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated/admin/content'
 import { Route as AuthenticatedAdminAparienciaRouteImport } from './routes/_authenticated/admin/apariencia'
 
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EsenciaRoute = EsenciaRouteImport.update({
   id: '/esencia',
   path: '/esencia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnviosRoute = EnviosRouteImport.update({
+  id: '/envios',
+  path: '/envios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DestacadoRoute = DestacadoRouteImport.update({
@@ -86,6 +99,12 @@ const AuthenticatedAdminOrdersRoute =
     path: '/orders',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminFamiliesRoute =
+  AuthenticatedAdminFamiliesRouteImport.update({
+    id: '/families',
+    path: '/families',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminContentRoute =
   AuthenticatedAdminContentRouteImport.update({
     id: '/content',
@@ -104,11 +123,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/catalogo': typeof CatalogoRoute
   '/destacado': typeof DestacadoRoute
+  '/envios': typeof EnviosRoute
   '/esencia': typeof EsenciaRoute
+  '/faq': typeof FaqRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/producto/$slug': typeof ProductoSlugRoute
   '/admin/apariencia': typeof AuthenticatedAdminAparienciaRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
+  '/admin/families': typeof AuthenticatedAdminFamiliesRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/products': typeof AuthenticatedAdminProductsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -119,10 +141,13 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/catalogo': typeof CatalogoRoute
   '/destacado': typeof DestacadoRoute
+  '/envios': typeof EnviosRoute
   '/esencia': typeof EsenciaRoute
+  '/faq': typeof FaqRoute
   '/producto/$slug': typeof ProductoSlugRoute
   '/admin/apariencia': typeof AuthenticatedAdminAparienciaRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
+  '/admin/families': typeof AuthenticatedAdminFamiliesRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/products': typeof AuthenticatedAdminProductsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -135,11 +160,14 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/catalogo': typeof CatalogoRoute
   '/destacado': typeof DestacadoRoute
+  '/envios': typeof EnviosRoute
   '/esencia': typeof EsenciaRoute
+  '/faq': typeof FaqRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/producto/$slug': typeof ProductoSlugRoute
   '/_authenticated/admin/apariencia': typeof AuthenticatedAdminAparienciaRoute
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
+  '/_authenticated/admin/families': typeof AuthenticatedAdminFamiliesRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/products': typeof AuthenticatedAdminProductsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
@@ -152,11 +180,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/catalogo'
     | '/destacado'
+    | '/envios'
     | '/esencia'
+    | '/faq'
     | '/admin'
     | '/producto/$slug'
     | '/admin/apariencia'
     | '/admin/content'
+    | '/admin/families'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/settings'
@@ -167,10 +198,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/catalogo'
     | '/destacado'
+    | '/envios'
     | '/esencia'
+    | '/faq'
     | '/producto/$slug'
     | '/admin/apariencia'
     | '/admin/content'
+    | '/admin/families'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/settings'
@@ -182,11 +216,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/catalogo'
     | '/destacado'
+    | '/envios'
     | '/esencia'
+    | '/faq'
     | '/_authenticated/admin'
     | '/producto/$slug'
     | '/_authenticated/admin/apariencia'
     | '/_authenticated/admin/content'
+    | '/_authenticated/admin/families'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/products'
     | '/_authenticated/admin/settings'
@@ -199,17 +236,33 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CatalogoRoute: typeof CatalogoRoute
   DestacadoRoute: typeof DestacadoRoute
+  EnviosRoute: typeof EnviosRoute
   EsenciaRoute: typeof EsenciaRoute
+  FaqRoute: typeof FaqRoute
   ProductoSlugRoute: typeof ProductoSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/esencia': {
       id: '/esencia'
       path: '/esencia'
       fullPath: '/esencia'
       preLoaderRoute: typeof EsenciaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/envios': {
+      id: '/envios'
+      path: '/envios'
+      fullPath: '/envios'
+      preLoaderRoute: typeof EnviosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/destacado': {
@@ -289,6 +342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminOrdersRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/families': {
+      id: '/_authenticated/admin/families'
+      path: '/families'
+      fullPath: '/admin/families'
+      preLoaderRoute: typeof AuthenticatedAdminFamiliesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/content': {
       id: '/_authenticated/admin/content'
       path: '/content'
@@ -309,6 +369,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAparienciaRoute: typeof AuthenticatedAdminAparienciaRoute
   AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
+  AuthenticatedAdminFamiliesRoute: typeof AuthenticatedAdminFamiliesRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminProductsRoute: typeof AuthenticatedAdminProductsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
@@ -319,6 +380,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminAparienciaRoute: AuthenticatedAdminAparienciaRoute,
     AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
+    AuthenticatedAdminFamiliesRoute: AuthenticatedAdminFamiliesRoute,
     AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
     AuthenticatedAdminProductsRoute: AuthenticatedAdminProductsRoute,
     AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
@@ -347,7 +409,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CatalogoRoute: CatalogoRoute,
   DestacadoRoute: DestacadoRoute,
+  EnviosRoute: EnviosRoute,
   EsenciaRoute: EsenciaRoute,
+  FaqRoute: FaqRoute,
   ProductoSlugRoute: ProductoSlugRoute,
 }
 export const routeTree = rootRouteImport
