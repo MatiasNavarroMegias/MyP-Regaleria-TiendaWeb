@@ -2,11 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { products as staticProducts, type Product, type Family } from "@/lib/products";
 
-const FAMILIES: Family[] = ["Amaderados", "Florales", "Cítricos", "Orientales"];
+const KNOWN_FAMILIES: Family[] = ["Amaderados", "Florales", "Cítricos", "Orientales"];
 const fallbackImg = staticProducts[0]?.img ?? "";
 
-function mapRow(row: Record<string, unknown>): Product {
-  const family = (FAMILIES.includes(row.family as Family) ? row.family : "Amaderados") as Family;
+export type DBProduct = Product & { id?: string };
+
+function mapRow(row: Record<string, unknown>): DBProduct {
+  const familyVal = row.family as Family;
+  const family = (KNOWN_FAMILIES.includes(familyVal) ? familyVal : (familyVal || "Amaderados")) as Family;
   const slug =
     (row.slug as string | null) ||
     String(row.name ?? "")
@@ -18,6 +21,7 @@ function mapRow(row: Record<string, unknown>): Product {
   const imagesArr = Array.isArray(row.images) ? (row.images as string[]).filter(Boolean) : [];
   const mainImg = (row.image_url as string) || imagesArr[0] || fallbackImg;
   return {
+    id: row.id as string | undefined,
     slug,
     name: String(row.name ?? ""),
     family,
@@ -32,7 +36,7 @@ function mapRow(row: Record<string, unknown>): Product {
   };
 }
 
-async function fetchProducts(): Promise<Product[]> {
+async function fetchProducts(): Promise<DBProduct[]> {
   const { data, error } = await supabase
     .from("products")
     .select("*")
@@ -44,15 +48,20 @@ async function fetchProducts(): Promise<Product[]> {
 
 export function useProducts() {
   const q = useQuery({ queryKey: ["products"], queryFn: fetchProducts });
-  const list = q.data && q.data.length > 0 ? q.data : staticProducts;
-  return { products: list, isLoading: q.isLoading };
+  const list = q.data && q.data.length > 0 ? q.data : (staticProducts as DBProduct[]);
+  // Sort: in-stock first (preserve original relative order), out-of-stock at the end
+  const sorted = [...list].sort((a, b) => {
+    const ao = a.stock > 0 ? 0 : 1;
+    const bo = b.stock > 0 ? 0 : 1;
+    return ao - bo;
+  });
+  return { products: sorted, isLoading: q.isLoading };
 }
 
 export function useProduct(slug: string) {
   const { products, isLoading } = useProducts();
   const fromDb = products.find((p) => p.slug === slug);
   const fromStatic = staticProducts.find((p) => p.slug === slug);
-  // Prefer DB but merge in reviews from static if available
   const product = fromDb
     ? { ...fromDb, reviews: fromDb.reviews.length ? fromDb.reviews : fromStatic?.reviews ?? [] }
     : fromStatic;

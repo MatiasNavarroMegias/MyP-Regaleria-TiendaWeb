@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plus, Pencil, Trash2, X, GripVertical } from "lucide-react";
+import { Plus, Pencil, Trash2, X, GripVertical, Crop } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
+import { ImageCropper } from "@/components/ImageCropper";
+import { useFamilies } from "@/lib/families";
 
 export const Route = createFileRoute("/_authenticated/admin/products")({
   component: ProductsAdmin,
@@ -31,6 +33,11 @@ function ProductsAdmin() {
   const [editing, setEditing] = useState<Partial<Product> | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [uploading, setUploading] = useState(false);
+  // cropper state: { src, replaceIndex? }  if replaceIndex undefined => append
+  const [cropping, setCropping] = useState<{ src: string; replaceIndex?: number } | null>(null);
+
+  const { data: families = [] } = useFamilies();
+  const familyNames = families.length ? families.filter((f) => f.active).map((f) => f.name) : ["Amaderados", "Florales", "Cítricos", "Orientales"];
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["admin-products"],
@@ -46,7 +53,7 @@ function ProductsAdmin() {
       const imgs = (p.images as string[] | null | undefined) ?? [];
       const payload = {
         name: p.name ?? "",
-        family: p.family ?? "Amaderados",
+        family: p.family ?? familyNames[0] ?? "Amaderados",
         gender: p.gender ?? "Unisex",
         notes_text: p.notes_text ?? null,
         description: p.description ?? null,
@@ -88,26 +95,38 @@ function ProductsAdmin() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Error al eliminar"),
   });
 
-  async function uploadImages(files: FileList) {
+  // Open cropper for a local file before uploading
+  function handleFilePicked(files: FileList) {
+    const file = files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setCropping({ src: url });
+  }
+
+  async function uploadBlob(blob: Blob): Promise<string | null> {
+    const path = `${crypto.randomUUID()}.jpg`;
+    const { error } = await supabase.storage.from("product-images").upload(path, blob, { contentType: "image/jpeg" });
+    if (error) { toast.error(error.message); return null; }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    return data.publicUrl;
+  }
+
+  async function onCropConfirm(blob: Blob) {
+    if (!cropping) return;
     setUploading(true);
-    const urls: string[] = [];
-    for (const file of Array.from(files)) {
-      const ext = file.name.split(".").pop();
-      const path = `${crypto.randomUUID()}.${ext}`;
-      const { error } = await supabase.storage.from("product-images").upload(path, file);
-      if (error) {
-        toast.error(error.message);
-        continue;
-      }
-      const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-      urls.push(data.publicUrl);
+    const url = await uploadBlob(blob);
+    if (url) {
+      setEditing((cur) => {
+        const base = cur ?? empty;
+        const existing = (base.images as string[] | null | undefined) ?? [];
+        const next = [...existing];
+        if (typeof cropping.replaceIndex === "number") next[cropping.replaceIndex] = url;
+        else next.push(url);
+        return { ...base, images: next, image_url: base.image_url || next[0] || "" };
+      });
     }
-    setEditing((cur) => {
-      const base = cur ?? empty;
-      const existing = (base.images as string[] | null | undefined) ?? [];
-      const next = [...existing, ...urls];
-      return { ...base, images: next, image_url: base.image_url || next[0] || "" };
-    });
+    URL.revokeObjectURL(cropping.src);
+    setCropping(null);
     setUploading(false);
   }
 
@@ -130,6 +149,10 @@ function ProductsAdmin() {
     });
   }
 
+  function editExisting(idx: number, url: string) {
+    setCropping({ src: url, replaceIndex: idx });
+  }
+
   const allChecked = items.length > 0 && selected.size === items.length;
   const toggleAll = () => setSelected(allChecked ? new Set() : new Set(items.map((p) => p.id)));
   const toggleOne = (id: string) => {
@@ -149,14 +172,11 @@ function ProductsAdmin() {
         </div>
         <div className="flex items-center gap-2">
           {selected.size > 0 && (
-            <button
-              onClick={() => { if (confirm(`¿Eliminar ${selected.size} producto(s) seleccionado(s)?`)) remove.mutate(Array.from(selected)); }}
-              className="flex items-center gap-2 bg-red-600 text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-red-500"
-            >
+            <button onClick={() => { if (confirm(`¿Eliminar ${selected.size} producto(s) seleccionado(s)?`)) remove.mutate(Array.from(selected)); }} className="flex items-center gap-2 bg-red-600 text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-red-500">
               <Trash2 className="size-4" /> Eliminar ({selected.size})
             </button>
           )}
-          <button onClick={() => setEditing({ ...empty })} className="flex items-center gap-2 bg-white text-zinc-900 px-4 py-2.5 rounded-md text-sm font-medium hover:bg-zinc-200">
+          <button onClick={() => setEditing({ ...empty, family: familyNames[0] ?? "Amaderados" })} className="flex items-center gap-2 bg-white text-zinc-900 px-4 py-2.5 rounded-md text-sm font-medium hover:bg-zinc-200">
             <Plus className="size-4" /> Nuevo producto
           </button>
         </div>
@@ -166,9 +186,7 @@ function ProductsAdmin() {
         <table className="w-full text-sm">
           <thead className="bg-zinc-900/80 text-zinc-500 text-[10px] uppercase tracking-widest">
             <tr>
-              <th className="px-4 py-3 w-10">
-                <input type="checkbox" checked={allChecked} onChange={toggleAll} />
-              </th>
+              <th className="px-4 py-3 w-10"><input type="checkbox" checked={allChecked} onChange={toggleAll} /></th>
               <th className="text-left px-5 py-3">Producto</th>
               <th className="text-left px-5 py-3">Familia</th>
               <th className="text-right px-5 py-3">Precio</th>
@@ -182,9 +200,7 @@ function ProductsAdmin() {
             {!isLoading && items.length === 0 && <tr><td colSpan={7} className="px-5 py-10 text-center text-zinc-500">Sin productos aún.</td></tr>}
             {items.map((p) => (
               <tr key={p.id} className={`hover:bg-zinc-900/60 ${selected.has(p.id) ? "bg-zinc-800/40" : ""}`}>
-                <td className="px-4 py-3 text-center">
-                  <input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleOne(p.id)} />
-                </td>
+                <td className="px-4 py-3 text-center"><input type="checkbox" checked={selected.has(p.id)} onChange={() => toggleOne(p.id)} /></td>
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-3">
                     {p.image_url ? <img src={p.image_url} alt="" className="size-10 object-cover rounded" /> : <div className="size-10 bg-zinc-800 rounded" />}
@@ -199,10 +215,8 @@ function ProductsAdmin() {
                 </td>
                 <td className="px-5 py-3 text-zinc-400">{p.family}</td>
                 <td className="px-5 py-3 text-right">${Number(p.price).toLocaleString("es-AR")}</td>
-                <td className="px-5 py-3 text-right">{p.stock}</td>
-                <td className="px-5 py-3 text-center">
-                  <span className={`inline-block size-2 rounded-full ${p.active ? "bg-emerald-500" : "bg-zinc-600"}`} />
-                </td>
+                <td className={`px-5 py-3 text-right ${p.stock <= 0 ? "text-red-400" : ""}`}>{p.stock}</td>
+                <td className="px-5 py-3 text-center"><span className={`inline-block size-2 rounded-full ${p.active ? "bg-emerald-500" : "bg-zinc-600"}`} /></td>
                 <td className="px-5 py-3 text-right">
                   <button onClick={() => setEditing(p)} className="p-2 text-zinc-400 hover:text-white"><Pencil className="size-4" /></button>
                   <button onClick={() => { if (confirm(`¿Eliminar "${p.name}"?`)) remove.mutate([p.id]); }} className="p-2 text-zinc-400 hover:text-red-400"><Trash2 className="size-4" /></button>
@@ -224,8 +238,8 @@ function ProductsAdmin() {
               <Field label="Nombre"><input required value={editing.name ?? ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })} className={inputCls} /></Field>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Familia olfativa">
-                  <select value={editing.family ?? "Amaderados"} onChange={(e) => setEditing({ ...editing, family: e.target.value })} className={inputCls}>
-                    {["Amaderados", "Florales", "Cítricos", "Orientales"].map((f) => <option key={f}>{f}</option>)}
+                  <select value={editing.family ?? ""} onChange={(e) => setEditing({ ...editing, family: e.target.value })} className={inputCls}>
+                    {familyNames.map((f) => <option key={f}>{f}</option>)}
                   </select>
                 </Field>
                 <Field label="Género"><input value={editing.gender ?? ""} onChange={(e) => setEditing({ ...editing, gender: e.target.value })} className={inputCls} /></Field>
@@ -248,19 +262,24 @@ function ProductsAdmin() {
                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-1">
                             <button type="button" onClick={() => moveImage(idx, -1)} disabled={idx === 0} className="p-1 text-white disabled:opacity-30" title="Mover izquierda"><GripVertical className="size-4 rotate-180" /></button>
                             <button type="button" onClick={() => moveImage(idx, 1)} disabled={idx === editingImages.length - 1} className="p-1 text-white disabled:opacity-30" title="Mover derecha"><GripVertical className="size-4" /></button>
+                            <button type="button" onClick={() => editExisting(idx, url)} className="p-1 text-white" title="Editar/recortar"><Crop className="size-4" /></button>
                             <button type="button" onClick={() => removeImage(url)} className="p-1 text-red-400 hover:text-red-300"><X className="size-4" /></button>
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={(e) => { const fs = e.target.files; if (fs && fs.length) uploadImages(fs); e.currentTarget.value = ""; }}
-                    className="text-xs text-zinc-400"
-                  />
+                  <label className="block">
+                    <span className="inline-flex items-center gap-2 cursor-pointer bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded text-xs">
+                      <Plus className="size-3.5" /> Subir y editar foto
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => { const fs = e.target.files; if (fs && fs.length) handleFilePicked(fs); e.currentTarget.value = ""; }}
+                    />
+                  </label>
                   {uploading && <p className="text-xs text-zinc-500">Subiendo…</p>}
                   <input
                     placeholder="o pegá una URL y presioná Enter"
@@ -291,6 +310,14 @@ function ProductsAdmin() {
             </form>
           </div>
         </div>
+      )}
+
+      {cropping && (
+        <ImageCropper
+          src={cropping.src}
+          onCancel={() => { URL.revokeObjectURL(cropping.src); setCropping(null); }}
+          onConfirm={onCropConfirm}
+        />
       )}
     </div>
   );

@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      families: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -71,6 +98,7 @@ export type Database = {
           payment_method: string | null
           shipping_option: string | null
           status: Database["public"]["Enums"]["order_status"]
+          stock_applied: boolean
           total: number
           updated_at: string
         }
@@ -85,6 +113,7 @@ export type Database = {
           payment_method?: string | null
           shipping_option?: string | null
           status?: Database["public"]["Enums"]["order_status"]
+          stock_applied?: boolean
           total?: number
           updated_at?: string
         }
@@ -99,6 +128,7 @@ export type Database = {
           payment_method?: string | null
           shipping_option?: string | null
           status?: Database["public"]["Enums"]["order_status"]
+          stock_applied?: boolean
           total?: number
           updated_at?: string
         }
@@ -295,12 +325,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      confirm_order: { Args: { p_order_id: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      place_order: {
+        Args: {
+          p_address: string
+          p_customer_email: string
+          p_customer_name: string
+          p_customer_phone: string
+          p_items: Json
+          p_notes: string
+        }
+        Returns: string
       }
     }
     Enums: {
