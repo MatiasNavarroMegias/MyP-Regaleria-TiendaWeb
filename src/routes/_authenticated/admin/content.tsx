@@ -69,7 +69,7 @@ function ContentAdmin() {
 
   const save = useMutation({
     mutationFn: async (key: string) => {
-      const value = draft[key] ?? {};
+      const value = (draft[key] ?? {}) as unknown as import("@/integrations/supabase/types").Json;
       const { error } = await supabase.from("site_content").upsert({ key, value });
       if (error) throw error;
     },
