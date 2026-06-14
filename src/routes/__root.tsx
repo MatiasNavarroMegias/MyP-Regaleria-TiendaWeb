@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeApplier } from "@/components/ThemeApplier";
+import { CartProvider } from "@/lib/cart";
 import {
   Outlet,
   Link,
@@ -127,8 +128,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeApplier />
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <CartProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </CartProvider>
     </QueryClientProvider>
   );
 }

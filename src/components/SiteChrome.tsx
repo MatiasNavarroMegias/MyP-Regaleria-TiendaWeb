@@ -1,13 +1,16 @@
 import { Link } from "@tanstack/react-router";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, ShoppingBag } from "lucide-react";
 import type { ReactNode } from "react";
 import { useAuth, useIsAdmin } from "@/hooks/useAuth";
 import { useSiteContent, pickString } from "@/lib/site-content";
+import { useCart } from "@/lib/cart";
+import { CartDrawer } from "@/components/CartDrawer";
 
 export function SiteChrome({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const { data: isAdmin } = useIsAdmin();
   const { data: content } = useSiteContent();
+  const { count, setOpen } = useCart();
   const c = content ?? {};
   const brand = (c.brand ?? {}) as Record<string, string>;
   const contact = (c.contact ?? {}) as Record<string, string>;
@@ -19,7 +22,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   const city = pickString(contact.city, "Buenos Aires, Argentina");
   const igUrl = pickString(contact.instagram, "https://www.instagram.com/nataliasantos.1701");
   const igHandle = pickString(contact.instagram_handle, "@nataliasantos.1701");
-  const whatsappNum = pickString(contact.whatsapp, "5491100000000");
+  const whatsappNum = pickString(contact.whatsapp, "5491112345678");
   const whatsappMsg = encodeURIComponent(pickString(contact.whatsapp_message, "Hola, me gustaría una asesoría de aromas"));
 
   return (
@@ -37,6 +40,12 @@ export function SiteChrome({ children }: { children: ReactNode }) {
         <div className="flex items-center gap-4 text-[11px] uppercase tracking-widest">
           {isAdmin && <Link to="/admin" className="hover:text-primary transition-colors">Admin</Link>}
           {!user && <Link to="/auth" className="hover:text-primary transition-colors">Ingresar</Link>}
+          <button onClick={() => setOpen(true)} aria-label="Carrito" className="relative flex items-center gap-1.5 hover:text-primary transition-colors">
+            <ShoppingBag className="size-4" strokeWidth={1.5} />
+            {count > 0 && (
+              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[9px] rounded-full size-4 flex items-center justify-center font-medium">{count}</span>
+            )}
+          </button>
         </div>
       </nav>
 
@@ -50,10 +59,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
               {isAdmin && <span className="ml-2 px-2 py-0.5 bg-primary text-primary-foreground text-[9px] tracking-widest">ADMIN</span>}
             </p>
             {isAdmin && (
-              <Link
-                to="/admin"
-                className="px-6 py-3 bg-primary text-primary-foreground text-[11px] uppercase tracking-[0.2em] hover:opacity-90 transition-opacity"
-              >
+              <Link to="/admin" className="px-6 py-3 bg-primary text-primary-foreground text-[11px] uppercase tracking-[0.2em] hover:opacity-90 transition-opacity">
                 Panel Admin →
               </Link>
             )}
@@ -66,7 +72,6 @@ export function SiteChrome({ children }: { children: ReactNode }) {
           {pickString(shipping.text, "Envíos seguros a todo el país vía Correo Argentino")}
         </p>
       </section>
-
 
       <footer className="bg-foreground text-background/80 py-20 px-6 md:px-24">
         <div className="max-w-7xl mx-auto">
@@ -84,9 +89,8 @@ export function SiteChrome({ children }: { children: ReactNode }) {
                 {pickString(footer.info_title, "Información")}
               </h4>
               <ul className="space-y-3 text-xs">
-                <li><span className="hover:text-background transition-colors">{pickString(footer.info_link_1, "Envíos y Devoluciones")}</span></li>
-                <li><span className="hover:text-background transition-colors">{pickString(footer.info_link_2, "Cuidado del perfume")}</span></li>
-                <li><span className="hover:text-background transition-colors">{pickString(footer.info_link_3, "Preguntas Frecuentes")}</span></li>
+                <li><Link to="/envios" className="hover:text-background transition-colors">Envíos y Devoluciones</Link></li>
+                <li><Link to="/faq" className="hover:text-background transition-colors">Preguntas Frecuentes</Link></li>
               </ul>
             </div>
             <div>
@@ -113,7 +117,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       </footer>
 
       <a
-        href={`https://wa.me/${whatsappNum}?text=${whatsappMsg}`}
+        href={`https://wa.me/${whatsappNum.replace(/\D/g, "")}?text=${whatsappMsg}`}
         target="_blank"
         rel="noreferrer noopener"
         aria-label="Consultar por WhatsApp"
@@ -123,6 +127,8 @@ export function SiteChrome({ children }: { children: ReactNode }) {
           <MessageCircle className="size-5" strokeWidth={2} />
         </span>
       </a>
+
+      <CartDrawer whatsappNumber={whatsappNum} brandName={brandName} />
     </div>
   );
 }
