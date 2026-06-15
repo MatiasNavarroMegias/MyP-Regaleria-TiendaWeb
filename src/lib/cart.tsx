@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 
 export type CartItem = {
   id: string; // product id (or slug fallback)
@@ -7,13 +8,14 @@ export type CartItem = {
   price: number;
   img?: string;
   qty: number;
+  maxStock?: number;
 };
 
 type CartCtx = {
   items: CartItem[];
   count: number;
   total: number;
-  add: (item: Omit<CartItem, "qty">, qty?: number) => void;
+  add: (item: Omit<CartItem, "qty">, qty?: number) => boolean;
   setQty: (id: string, qty: number) => void;
   remove: (id: string) => void;
   clear: () => void;
@@ -43,19 +45,41 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items, hydrated]);
 
   const add = useCallback((it: Omit<CartItem, "qty">, qty = 1) => {
+    let added = true;
     setItems((prev) => {
       const i = prev.findIndex((p) => p.id === it.id);
+      const max = typeof it.maxStock === "number" ? it.maxStock : Infinity;
+      if (max <= 0) {
+        toast.error("Sin stock disponible");
+        added = false;
+        return prev;
+      }
       if (i >= 0) {
+        const current = prev[i].qty;
+        const next = Math.min(max, current + qty);
+        if (next === current) {
+          toast.error(`Sólo hay ${max} unidades disponibles`);
+          added = false;
+          return prev;
+        }
         const copy = [...prev];
-        copy[i] = { ...copy[i], qty: copy[i].qty + qty };
+        copy[i] = { ...copy[i], qty: next, maxStock: max };
         return copy;
       }
-      return [...prev, { ...it, qty }];
+      const next = Math.min(max, qty);
+      return [...prev, { ...it, qty: next, maxStock: max }];
     });
+    return added;
   }, []);
 
   const setQty = useCallback((id: string, qty: number) => {
-    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, qty: Math.max(1, qty) } : p)));
+    setItems((prev) => prev.map((p) => {
+      if (p.id !== id) return p;
+      const max = typeof p.maxStock === "number" ? p.maxStock : Infinity;
+      const clamped = Math.min(max, Math.max(1, qty));
+      if (clamped < qty) toast.error(`Sólo hay ${max} unidades disponibles`);
+      return { ...p, qty: clamped };
+    }));
   }, []);
 
   const remove = useCallback((id: string) => {
