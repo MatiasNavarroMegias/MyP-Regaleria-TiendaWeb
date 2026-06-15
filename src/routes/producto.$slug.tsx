@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Star, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
+import { ArrowLeft, Star, MessageCircle, ChevronLeft, ChevronRight, ShoppingBag, Minus, Plus } from "lucide-react";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ProductCard } from "@/components/ProductCard";
 import { formatPrice, type Review } from "@/lib/products";
 import { useProduct } from "@/lib/useProducts";
+import { useCart } from "@/lib/cart";
 
 export const Route = createFileRoute("/producto/$slug")({
   head: ({ params }) => ({
