@@ -36,6 +36,8 @@ export const Route = createFileRoute("/producto/$slug")({
 function ProductDetail() {
   const { slug } = Route.useParams();
   const { product: p, products, isLoading } = useProduct(slug);
+  const { add, setOpen: setCartOpen } = useCart();
+  const [qty, setQty] = useState(1);
 
   if (isLoading && !p) {
     return (
