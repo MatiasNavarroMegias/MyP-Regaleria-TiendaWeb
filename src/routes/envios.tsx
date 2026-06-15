@@ -1,16 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteChrome } from "@/components/SiteChrome";
-import { useSiteContent, pickString, siteContentQuery } from "@/lib/site-content";
+import { useSiteContent, pickString, siteContentQuery, type ContentMap } from "@/lib/site-content";
 
 export const Route = createFileRoute("/envios")({
-  head: () => ({
-    meta: [
-      { title: "Envíos y Devoluciones — Natalia Santos" },
-      { name: "description", content: "Información sobre envíos a todo el país, tiempos de entrega, cambios y devoluciones." },
-      { property: "og:title", content: "Envíos y Devoluciones — Natalia Santos" },
-    ],
-  }),
   loader: ({ context }) => context.queryClient.ensureQueryData(siteContentQuery),
+  head: ({ loaderData }) => {
+    const data = loaderData as ContentMap | undefined;
+    const brand = (data?.brand ?? {}) as Record<string, string>;
+    const name = pickString(brand.name, "Natalia Santos");
+    const c = (data?.shipping_returns ?? {}) as { title?: string };
+    const title = `${pickString(c.title, "Envíos y Devoluciones")} — ${name}`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: "Información sobre envíos a todo el país, tiempos de entrega, cambios y devoluciones." },
+        { property: "og:title", content: title },
+      ],
+    };
+  },
   component: EnviosPage,
 });
 
