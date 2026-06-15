@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { SiteChrome } from "@/components/SiteChrome";
-import { useSiteContent, pickString } from "@/lib/site-content";
+import { useSiteContent, pickString, siteContentQuery } from "@/lib/site-content";
 
 export const Route = createFileRoute("/faq")({
   head: () => ({
@@ -12,6 +12,7 @@ export const Route = createFileRoute("/faq")({
       { property: "og:title", content: "Preguntas Frecuentes — Natalia Santos" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(siteContentQuery),
   component: FaqPage,
 });
 
