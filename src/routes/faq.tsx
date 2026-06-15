@@ -2,17 +2,24 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { SiteChrome } from "@/components/SiteChrome";
-import { useSiteContent, pickString, siteContentQuery } from "@/lib/site-content";
+import { useSiteContent, pickString, siteContentQuery, type ContentMap } from "@/lib/site-content";
 
 export const Route = createFileRoute("/faq")({
-  head: () => ({
-    meta: [
-      { title: "Preguntas Frecuentes — Natalia Santos" },
-      { name: "description", content: "Respuestas a las consultas más comunes sobre nuestras fragancias, envíos y compras." },
-      { property: "og:title", content: "Preguntas Frecuentes — Natalia Santos" },
-    ],
-  }),
   loader: ({ context }) => context.queryClient.ensureQueryData(siteContentQuery),
+  head: ({ loaderData }) => {
+    const data = loaderData as ContentMap | undefined;
+    const brand = (data?.brand ?? {}) as Record<string, string>;
+    const name = pickString(brand.name, "Natalia Santos");
+    const c = (data?.faqs ?? {}) as { title?: string };
+    const title = `${pickString(c.title, "Preguntas Frecuentes")} — ${name}`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: "Respuestas a las consultas más comunes sobre nuestras fragancias, envíos y compras." },
+        { property: "og:title", content: title },
+      ],
+    };
+  },
   component: FaqPage,
 });
 
