@@ -14,9 +14,11 @@ export function ProductCard({ p }: { p: CardProduct }) {
     e.preventDefault();
     e.stopPropagation();
     if (outOfStock) return;
-    add({ id: p.id ?? p.slug, slug: p.slug, name: p.name, price: p.price, img: p.img }, 1);
-    toast.success(`${p.name} agregado al carrito`);
-    setOpen(true);
+    const ok = add({ id: p.id ?? p.slug, slug: p.slug, name: p.name, price: p.price, img: p.img, maxStock: p.stock }, 1);
+    if (ok) {
+      toast.success(`${p.name} agregado al carrito`);
+      setOpen(true);
+    }
   }
 
   return (
