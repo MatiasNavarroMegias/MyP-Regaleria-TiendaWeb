@@ -3,23 +3,37 @@ import { SiteChrome } from "@/components/SiteChrome";
 import { ProductCard } from "@/components/ProductCard";
 import { type Family } from "@/lib/products";
 import { useProducts } from "@/lib/useProducts";
-import { useSiteContent, pickString, resolveImage } from "@/lib/site-content";
+import { useSiteContent, pickString, resolveImage, siteContentQuery, type ContentMap } from "@/lib/site-content";
 import hero from "@/assets/hero.jpg";
 import perfume1 from "@/assets/perfume-1.jpg";
 import perfume2 from "@/assets/perfume-2.jpg";
 import perfume3 from "@/assets/perfume-3.jpg";
 import featured from "@/assets/featured.jpg";
 
+function buildMeta(data: ContentMap | undefined) {
+  const brand = (data?.brand ?? {}) as Record<string, string>;
+  const heroC = (data?.hero ?? {}) as Record<string, string>;
+  const name = pickString(brand.name, "Natalia Santos");
+  const tagline = pickString(brand.tagline, "Perfumería de Autor");
+  const title = `${name} — ${tagline}`;
+  const description = pickString(heroC.subtitle, "Fragancias de autor maceradas artesanalmente en Buenos Aires.");
+  return { title, description, image: resolveImage(heroC.image_url, hero) };
+}
+
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Natalia Santos — Perfumería de Autor" },
-      { name: "description", content: "Fragancias de autor maceradas artesanalmente en Buenos Aires. Perfumes que cuentan tu historia." },
-      { property: "og:title", content: "Natalia Santos — Perfumería de Autor" },
-      { property: "og:description", content: "Fragancias de autor maceradas artesanalmente en Buenos Aires." },
-      { property: "og:image", content: hero },
-    ],
-  }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(siteContentQuery),
+  head: ({ loaderData }) => {
+    const m = buildMeta(loaderData as ContentMap | undefined);
+    return {
+      meta: [
+        { title: m.title },
+        { name: "description", content: m.description },
+        { property: "og:title", content: m.title },
+        { property: "og:description", content: m.description },
+        { property: "og:image", content: m.image },
+      ],
+    };
+  },
   component: Index,
 });
 
