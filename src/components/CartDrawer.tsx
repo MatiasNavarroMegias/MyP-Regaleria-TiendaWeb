@@ -85,7 +85,16 @@ export function CartDrawer({ whatsappNumber, brandName }: Props) {
                   <div className="flex items-center gap-2 mt-2">
                     <button onClick={() => setQty(it.id, it.qty - 1)} className="size-7 border border-border flex items-center justify-center hover:bg-accent"><Minus className="size-3" /></button>
                     <span className="w-8 text-center text-sm">{it.qty}</span>
-                    <button onClick={() => setQty(it.id, it.qty + 1)} className="size-7 border border-border flex items-center justify-center hover:bg-accent"><Plus className="size-3" /></button>
+                    <button
+                      onClick={() => setQty(it.id, it.qty + 1)}
+                      disabled={typeof it.maxStock === "number" && it.qty >= it.maxStock}
+                      className="size-7 border border-border flex items-center justify-center hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <Plus className="size-3" />
+                    </button>
+                    {typeof it.maxStock === "number" && (
+                      <span className="text-[10px] text-foreground/50 ml-1">/ {it.maxStock}</span>
+                    )}
                     <button onClick={() => remove(it.id)} className="ml-auto text-foreground/60 hover:text-destructive"><Trash2 className="size-4" /></button>
                   </div>
                 </div>
