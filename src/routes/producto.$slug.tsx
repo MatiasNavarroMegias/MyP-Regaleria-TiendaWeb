@@ -123,15 +123,62 @@ function ProductDetail() {
                 </div>
               </div>
 
-              <a
-                href={waLink}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full bg-foreground text-background py-4 text-[10px] uppercase tracking-widest font-[var(--font-mono)] hover:bg-foreground/90 transition-colors"
-              >
-                <MessageCircle className="size-4" strokeWidth={1.5} />
-                Consultar por WhatsApp
-              </a>
+              {p.stock > 0 && (
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="font-[var(--font-mono)] text-[10px] uppercase tracking-widest text-foreground/60">Cantidad</span>
+                  <div className="inline-flex items-center border border-border">
+                    <button
+                      type="button"
+                      onClick={() => setQty((q) => Math.max(1, q - 1))}
+                      aria-label="Restar"
+                      className="size-9 flex items-center justify-center hover:bg-accent"
+                    >
+                      <Minus className="size-3.5" />
+                    </button>
+                    <span className="w-10 text-center text-sm">{Math.min(qty, p.stock)}</span>
+                    <button
+                      type="button"
+                      onClick={() => setQty((q) => {
+                        if (q >= p.stock) { toast.error(`Sólo hay ${p.stock} unidades disponibles`); return q; }
+                        return q + 1;
+                      })}
+                      aria-label="Sumar"
+                      className="size-9 flex items-center justify-center hover:bg-accent"
+                    >
+                      <Plus className="size-3.5" />
+                    </button>
+                  </div>
+                  <span className="text-[11px] text-foreground/50">máx. {p.stock}</span>
+                </div>
+              )}
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  disabled={p.stock <= 0}
+                  onClick={() => {
+                    const desired = Math.min(qty, p.stock);
+                    const ok = add({ id: (p as { id?: string }).id ?? p.slug, slug: p.slug, name: p.name, price: p.price, img: p.img, maxStock: p.stock }, desired);
+                    if (ok) {
+                      toast.success(`${p.name} agregado al carrito`);
+                      setCartOpen(true);
+                    }
+                  }}
+                  className="inline-flex items-center justify-center gap-2 w-full bg-foreground text-background py-4 text-[10px] uppercase tracking-widest font-[var(--font-mono)] hover:bg-foreground/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ShoppingBag className="size-4" strokeWidth={1.5} />
+                  {p.stock <= 0 ? "Sin stock" : "Agregar al carrito"}
+                </button>
+                <a
+                  href={waLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 w-full bg-emerald-600 text-white py-4 text-[10px] uppercase tracking-widest font-[var(--font-mono)] hover:bg-emerald-500 transition-colors"
+                >
+                  <MessageCircle className="size-4" strokeWidth={1.5} />
+                  Consultar por WhatsApp
+                </a>
+              </div>
             </div>
           </div>
 
