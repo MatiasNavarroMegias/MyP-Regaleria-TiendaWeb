@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteChrome } from "@/components/SiteChrome";
-import { useSiteContent, pickString } from "@/lib/site-content";
+import { useSiteContent, pickString, siteContentQuery } from "@/lib/site-content";
 
 export const Route = createFileRoute("/envios")({
   head: () => ({
@@ -10,6 +10,7 @@ export const Route = createFileRoute("/envios")({
       { property: "og:title", content: "Envíos y Devoluciones — Natalia Santos" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(siteContentQuery),
   component: EnviosPage,
 });
 
