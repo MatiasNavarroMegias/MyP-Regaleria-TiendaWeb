@@ -86,14 +86,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Perfumería Buenos Aires" },
+      { name: "description", content: "Maquete de emprendimiento de venta de perfumes" },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Perfumería Buenos Aires" },
+      { property: "og:description", content: "Maquete de emprendimiento de venta de perfumes" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Perfumería Buenos Aires" },
+      { name: "twitter:description", content: "Maquete de emprendimiento de venta de perfumes" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bd90a036-a12f-45a9-a098-e0cda14cfaad/id-preview-3d3928db--3fa978b7-f733-43c3-a69b-d0c9d45f3d8e.lovable.app-1781488335121.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bd90a036-a12f-45a9-a098-e0cda14cfaad/id-preview-3d3928db--3fa978b7-f733-43c3-a69b-d0c9d45f3d8e.lovable.app-1781488335121.png" },
     ],
     links: [
       {
